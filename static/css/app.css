@@ -1,0 +1,49 @@
+#app {
+    min-height: 100vh;
+    padding: 0;
+    margin: 0;
+    background-color: #0a0a0a;
+}
+
+/* Nav */
+.navbar-brand .navbar-item {
+    font-family: "Gugi", cursvie;
+}
+
+.navbar-end .navbar-item {
+    font-family: "Noto Sans KR", sans-serif;
+    font-weight: 400;
+}
+
+/* Signup */
+.signup * {
+    font-family: "Noto Sans KR", sans-serif;
+    font-weight: 400;
+}
+
+.signup .title {
+    font-family: 'Gugi', cursive;
+    font-weight: bold;
+    color: #fff;
+}
+
+.signup .label {
+    color: #fff;
+}
+
+/* Login */
+.login {
+    font-family: "Noto Sans KR", sans-serif;
+    font-weight: 400;
+}
+
+.login .title {
+    font-family: 'Gugi', cursive;
+    font-weight: bold;
+    color: #fff;
+}
+
+.login .label {
+    color: #fff;
+    font-weight: 400;
+}

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block app %}
+  <ul>
+    <li v-for="list in lists">[[ list.title ]]
+      <input type="text" v-model="todoInput" placeholder="할 일 추가..." @keydown.enter="createTodo(list)">
+      <ul v-show="list.todos.length">
+        <li v-for="todo in list.todos">[[ todo.title ]]
+          <input type="text" v-model="detailInput" placeholder="디테일 추가..." @keydown.enter="createDetail(todo)">
+          <ul v-show="todo.details.length">
+            <li v-for="detail in todo.details">[[ detail.content ]]</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+{% endblock %}
+{% block script %}
+  <script>
+      axios.defaults.xsrfCookieName = 'csrftoken';
+      axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+      const app = new Vue({
+          delimiters: ['[[', ']]'],
+          el: '#app',
+          data: {
+              lists: [],
+              todoInput: '',
+              detailInput: '',
+          },
+          methods: {
+              createTodo: function (list) {
+                  if (this.todoInput) {
+                      axios.post("{% url 'todos:todos_list' %}", {
+                          title: this.todoInput,
+                          list: list.id,
+                      }).then((res) => {
+                          console.log('Save todo');
+                          const todo = res.data;
+                          list.todos.push(todo);
+                      });
+                      this.todoInput = '';
+                  } else {
+                      console.log('Nothing to submit')
+                  }
+              },
+              createDetail: function (todo) {
+                  if (this.detailInput) {
+                      let url = "{% url 'todos:details_list' 0 %}";
+                      url = url.replace('0', `${todo.id}`);
+                      axios.post(url, {
+                          content: this.detailInput,
+                          todo: todo.id,
+                      }).then((res) => {
+                          console.log('Save detail');
+                          const detail = res.data;
+                          todo.details.push(detail);
+                      });
+                      this.detailInput = '';
+                  } else {
+                      console.log('Nothing to submit')
+                  }
+              },
+          },
+          created: function () {
+              let url = "{% url "accounts:profile" "foobar" %}";
+              if ("{{ user.is_authenticated }}" === "True") {
+                  url = url.replace("foobar", "{{ user.username }}");
+                  axios.get(url)
+                      .then((res) => {
+                          this.lists = res.data.lists;
+                      });
+              }
+          },
+      });
+  </script>
+{% endblock %}
