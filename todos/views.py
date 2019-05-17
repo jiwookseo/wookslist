@@ -14,6 +14,7 @@ def lists_list(request):
         return Response(serializer.data)
     else:
         if request.user.is_authenticated:
+            request.data['user'] = request.user.id
             serializer = ListSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
