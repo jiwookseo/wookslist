@@ -29,18 +29,20 @@
                  @keyup.enter="createTodo(selectedList)">
           <aside class="menu" v-show="selectedList.todos" style="margin-top: 10px;">
             <ul class="menu-list">
-              <li v-for="todo in selectedList.todos" v-show="!todo.checked">
+              <li v-for="todo in notFinished">
                 <a>
-                  <input type="checkbox" v-model="todo.checked">
+                  <input type="text" v-model="todo.check" @click="check(todo)">
                   [[ todo.title ]]
                 </a>
               </li>
             </ul>
-            <ul class="menu-list">
-              <li v-for="todo in selectedList.todos" v-show="todo.checked">
-                {#add vue method and django view action#}
+            <p class="menu-label" v-show="finished.length">
+              Finished
+            </p>
+            <ul class="menu-list" v-show="finished.length">
+              <li v-for="todo in finished">
                 <a class="has-background-grey-lighter">
-                  <input type="checkbox" v-model="todo.checked">
+                  <input type="text" v-model="todo.check" @click="check(todo)">
                   [[ todo.title ]]
                 </a>
               </li>
@@ -55,7 +57,6 @@
       <div class="container">
         <div class="columns">
           <div class="column is-one-third">
-
           </div>
           <div class="column">
             <h1 class="title">
@@ -97,86 +98,117 @@
     axios.defaults.xsrfCookieName = 'csrftoken';
     axios.defaults.xsrfHeaderName = 'X-CSRFToken';
     const app = new Vue({
-      delimiters: ['[[', ']]'],
-      el: '#app',
-      data: {
-        lists: [],
-        listInput: '',
-        todoInput: '',
-        detailInput: '',
-        selectedList: [],
-        toggle: false,
-      },
-      methods: {
-        toggleInput: function () {
-          if (this.toggle) {
-            this.toggle = false;
-            this.listInput = '';
-          } else this.toggle = true;
+        delimiters: ['[[', ']]'],
+        el: '#app',
+        data: {
+          lists: [],
+          selectedList: [],
+          listInput: '',
+          todoInput: '',
+          detailInput: '',
+          notFinished: [],
+          finished: [],
+          toggle: false,
         },
-        createList: function () {
-          if (this.listInput) {
-            axios.post("{% url 'todos:lists_list' %}", {
-              title: this.listInput,
-            }).then((res) => {
-              console.log('Save list');
-              const list = res.data;
-              this.lists.push(list);
-              this.selectedList = list;
-            });
-            this.listInput = '';
-            this.toggle = false;
-          } else {
-            console.log('Nothing to submit')
-          }
-        },
-        createTodo: function (list) {
-          if (this.todoInput) {
-            axios.post("{% url 'todos:todos_list' %}", {
-              title: this.todoInput,
-              list: list.id,
-            }).then((res) => {
-              console.log('Save todo');
-              const todo = res.data;
-              list.todos.push(todo);
-            });
-            this.todoInput = '';
-          } else {
-            console.log('Nothing to submit')
-          }
-        },
-        createDetail: function (todo) {
-          if (this.detailInput) {
-            let url = "{% url 'todos:details_list' 0 %}";
-            url = url.replace('0', `${todo.id}`);
-            axios.post(url, {
-              content: this.detailInput,
-              todo: todo.id,
-            }).then((res) => {
-              console.log('Save detail');
-              const detail = res.data;
-              todo.details.push(detail);
-            });
-            this.detailInput = '';
-          } else {
-            console.log('Nothing to submit')
-          }
-        },
-        selectList: function (list) {
-          this.selectedList = list
-        }
-      },
-      created: function () {
-        let url = "{% url "accounts:profile" "foobar" %}";
-        if ("{{ user.is_authenticated }}" === "True") {
-          url = url.replace("foobar", "{{ user.username }}");
-          axios.get(url)
-            .then(res => {
-              this.lists = res.data.lists;
+        methods: {
+          toggleInput: function () {
+            if (this.toggle) {
+              this.toggle = false;
+              this.listInput = '';
+            } else this.toggle = true;
+          },
+          createList: function () {
+            if (this.listInput) {
+              axios.post("{% url 'todos:lists_list' %}", {
+                title: this.listInput,
+              }).then((res) => {
+                console.log('Save list');
+                const list = res.data;
+                this.lists.push(list);
+                this.finished = [];
+                this.notFinished = [];
+                this.selectedList = list;
+              });
+              this.listInput = '';
+              this.toggle = false;
+            } else {
+              console.log('Nothing to submit')
+            }
+          },
+          createTodo: function (list) {
+            if (this.todoInput) {
+              axios.post("{% url 'todos:todos_list' %}", {
+                title: this.todoInput,
+                list: list.id,
+              }).then((res) => {
+                console.log('Save todo');
+                const todo = res.data;
+                list.todos.push(todo);
+              });
+              this.todoInput = '';
+            } else {
+              console.log('Nothing to submit')
+            }
+          },
+          createDetail: function (todo) {
+            if (this.detailInput) {
+              let url = "{% url 'todos:details_list' 0 %}";
+              url = url.replace('0', `${todo.id}`);
+              axios.post(url, {
+                content: this.detailInput,
+                todo: todo.id,
+              }).then((res) => {
+                console.log('Save detail');
+                const detail = res.data;
+                todo.details.push(detail);
+              });
+              this.detailInput = '';
+            } else {
+              console.log('Nothing to submit')
+            }
+          },
+          selectList: function (list) {
+            this.finished = [];
+            this.notFinished = [];
+            this.selectedList = list;
+            list.todos.forEach(todo => {
+              if (todo.check) {
+                this.finished.push(todo)
+              } else {
+                this.notFinished.push(todo)
+              }
             })
-            .then(res => this.selectedList = this.lists[0]);
-        }
-      },
-    });
+          },
+          check: function (todo) {
+            {#axios.get()#}
+            if (todo.check) {
+              this.notFinished.push(todo);
+              this.finished = this.finished.filter(item => item !== todo);
+              todo.check = false;
+            } else {
+              this.finished.push(todo);
+              this.notFinished = this.notFinished.filter(item => item !== todo);
+              todo.check = true;
+            }
+          }
+        },
+        created: function () {
+          let url = "{% url "accounts:profile" "foobar" %}";
+          if ("{{ user.is_authenticated }}" === "True") {
+            url = url.replace("foobar", "{{ user.username }}");
+            axios.get(url)
+              .then(res => {
+                this.lists = res.data.lists;
+              })
+              .then(res => {
+                this.selectedList = this.lists[0];
+                this.selectedList.todos.forEach(todo => {
+                  if (todo.checked) this.finished.push(todo); else this.notFinished.push(todo);
+                })
+              });
+          }
+        },
+      })
+    ;
   </script>
 {% endblock %}
