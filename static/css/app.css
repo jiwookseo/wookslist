@@ -6,6 +6,19 @@
 }
 
 /* Nav */
+
+#nav .menu-list {
+    position: absolute;
+    top: 9.6px;
+    right: 0;
+    width: 12vw;
+}
+
+.search-movie {
+    background-color: white;
+    margin: 1px;
+}
+
 .navbar-brand .navbar-item {
     font-family: "Gugi", cursvie;
 }

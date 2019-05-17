@@ -1,6 +1,6 @@
 <!-- .Nav -->
-<nav class="navbar is-black" id="nav">
-  <div class="container is-fluid" style="margin: 10px 64px;">
+<nav class="navbar is-black" id="nav" style="padding-top: 0.6rem;">
+  <div class="container is-fluid">
     <div class="navbar-brand">
       <a class="navbar-item" href="{% url 'todos:index' %}">
         <span @mouseover="hover='Wookslist'" @mouseleave="hover='ㅇㅅㄹㅅㅌ'" v-text="hover">ㅇㅅㄹㅅㅌ</span>
@@ -9,9 +9,9 @@
             @click="showNav = !showNav"
             :class="{ 'is-active': showNav }"
             data-target="navbarMenuHeroA">
-      <span></span>
-      <span></span>
-      <span></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
     </span>
     </div>
     <div id="navbarMenuHeroA" class="navbar-menu has-background-black" :class="{ 'is-active': showNav }">
