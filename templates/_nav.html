@@ -24,18 +24,18 @@
       </span>
           <span class="navbar-item">
         <a class="button is-light is-outlined" href="{% url 'accounts:logout' %}">
-          <span>로그아웃</span>
+          <span>Logout</span>
         </a>
       </span>
         {% else %}
           <span class="navbar-item">
         <a class="button is-primary is-outlined" href="{% url 'accounts:signup' %}">
-          <span>회원가입</span>
+          <span>Sign up</span>
         </a>
       </span>
           <span class="navbar-item">
         <a class="button is-light is-outlined" href="{% url 'accounts:login' %}">
-          <span>로그인</span>
+          <span>Login</span>
         </a>
       </span>
         {% endif %}
@@ -44,13 +44,13 @@
   </div>
 </nav>
 <script>
-    const nav = new Vue({
-        el: '#nav',
-        data: {
-            hover: 'ㅇㅅㄹㅅㅌ',
-            showNav: false,
-            query: '',
-        }
-    });
+  const nav = new Vue({
+    el: '#nav',
+    data: {
+      hover: 'ㅇㅅㄹㅅㅌ',
+      showNav: false,
+      query: '',
+    }
+  });
 </script>
 <!-- /.Nav -->
