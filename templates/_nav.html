@@ -1,10 +1,12 @@
 <!-- .Nav -->
-<nav class="navbar is-black" id="nav" style="padding-top: 0.6rem;">
+{% load static %}
+<nav class="navbar is-white" id="nav" style="padding-top: 0.6rem;">
   <div class="container is-fluid">
     <div class="navbar-brand">
-      <a class="navbar-item" href="{% url 'todos:index' %}">
-        <span @mouseover="hover='Wookslist'" @mouseleave="hover='ㅇㅅㄹㅅㅌ'" v-text="hover">ㅇㅅㄹㅅㅌ</span>
-      </a>
+      <div class="navbar-item">
+        <img @mouseover="logo='{% static 'image/logo1.png' %}'" @mouseleave="logo='{% static 'image/logo2.png' %}'"
+             :src="logo" @click="goHome">
+      </div>
       <span class="navbar-burger burger"
             @click="showNav = !showNav"
             :class="{ 'is-active': showNav }"
@@ -14,17 +16,17 @@
       <span aria-hidden="true"></span>
     </span>
     </div>
-    <div id="navbarMenuHeroA" class="navbar-menu has-background-black" :class="{ 'is-active': showNav }">
+    <div id="navbarMenuHeroA" class="navbar-menu has-background-white" :class="{ 'is-active': showNav }">
       <div class="navbar-end">
         {% if user.is_active %}
           <span class="navbar-item">
-        <a class="button is-primary is-outlined" href="{% url 'todos:index' %}">
-          <span>sign in by {{ user.username }}</span>
+        <a class="button is-primary is-outlined" href="{% url 'accounts:logout' %}">
+          <span>Logout</span>
         </a>
       </span>
           <span class="navbar-item">
-        <a class="button is-light is-outlined" href="{% url 'accounts:logout' %}">
-          <span>Logout</span>
+        <a class="button is-primary" href="{% url 'todos:index' %}">
+          <span>sign in by {{ user.username }}</span>
         </a>
       </span>
         {% else %}
@@ -34,7 +36,7 @@
         </a>
       </span>
           <span class="navbar-item">
-        <a class="button is-light is-outlined" href="{% url 'accounts:login' %}">
+        <a class="button is-primary" href="{% url 'accounts:login' %}">
           <span>Login</span>
         </a>
       </span>
@@ -47,10 +49,15 @@
   const nav = new Vue({
     el: '#nav',
     data: {
-      hover: 'ㅇㅅㄹㅅㅌ',
+      logo: '{% static 'image/logo2.png' %}',
       showNav: false,
       query: '',
-    }
+    },
+    methods: {
+      goHome: function () {
+        window.location.replace("{% url 'todos:index' %}")
+      }
+    },
   });
 </script>
 <!-- /.Nav -->
