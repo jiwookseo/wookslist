@@ -1,75 +1,117 @@
 {% extends 'base.html' %}
 {% block app %}
-  <ul>
-    <li v-for="list in lists">[[ list.title ]]
-      <input type="text" v-model="todoInput" placeholder="할 일 추가..." @keydown.enter="createTodo(list)">
-      <ul v-show="list.todos.length">
-        <li v-for="todo in list.todos">[[ todo.title ]]
-          <input type="text" v-model="detailInput" placeholder="디테일 추가..." @keydown.enter="createDetail(todo)">
-          <ul v-show="todo.details.length">
-            <li v-for="detail in todo.details">[[ detail.content ]]</li>
+  <div class="container is-fluid">
+    <div class="tile is-ancestor">
+      <div class="tile is-2 is-vertical is-parent">
+        <div class="tile is-child box">
+          <p class="title">{{ user.username }}</p>
+          <ul>
+            <li
+                    class="button is-dark is-fullwidth"
+                    :class="{ 'is-inverted': list != selectedList, 'is-outlined': list == selectedList }"
+                    v-for="list in lists"
+                    @click="selectList(list)"
+                    style="margin-top: 10px;"
+            >
+              [[ list.title ]]
+            </li>
           </ul>
-        </li>
-      </ul>
-    </li>
-  </ul>
+        </div>
+      </div>
+      <div class="tile is-parent">
+        <div class="tile is-child box">
+          <p class="title">[[ selectedList.title ]]</p>
+          <input class="input" type="text" v-model="todoInput" placeholder="할 일 추가..."
+                 @keydown.enter="createTodo(selectedList)">
+          <aside class="menu" v-show="selectedList.todos" style="margin-top: 10px;">
+            <ul class="menu-list">
+              <li v-for="todo in selectedList.todos" v-show="!todo.checked">
+                <a>
+                  <input type="checkbox" v-model="todo.checked">
+                  [[ todo.title ]]
+                </a>
+              </li>
+            </ul>
+            <ul class="menu-list">
+              <li v-for="todo in selectedList.todos" v-show="todo.checked">
+                {#add vue method and django view action#}
+                <a>
+                  <input type="checkbox" v-model="todo.checked">
+                  [[ todo.title ]]
+                </a>
+              </li>
+            </ul>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+  {#  <input type="text" v-model="detailInput" placeholder="디테일 추가..." @keydown.enter="createDetail(todo)">#}
+  {#  <ul v-show="todo.details">#}
+  {#    <li v-for="detail in todo.details">[[ detail.content ]]</li>#}
+  {#  </ul>#}
 {% endblock %}
 {% block script %}
   <script>
-      axios.defaults.xsrfCookieName = 'csrftoken';
-      axios.defaults.xsrfHeaderName = 'X-CSRFToken';
-      const app = new Vue({
-          delimiters: ['[[', ']]'],
-          el: '#app',
-          data: {
-              lists: [],
-              todoInput: '',
-              detailInput: '',
-          },
-          methods: {
-              createTodo: function (list) {
-                  if (this.todoInput) {
-                      axios.post("{% url 'todos:todos_list' %}", {
-                          title: this.todoInput,
-                          list: list.id,
-                      }).then((res) => {
-                          console.log('Save todo');
-                          const todo = res.data;
-                          list.todos.push(todo);
-                      });
-                      this.todoInput = '';
-                  } else {
-                      console.log('Nothing to submit')
-                  }
-              },
-              createDetail: function (todo) {
-                  if (this.detailInput) {
-                      let url = "{% url 'todos:details_list' 0 %}";
-                      url = url.replace('0', `${todo.id}`);
-                      axios.post(url, {
-                          content: this.detailInput,
-                          todo: todo.id,
-                      }).then((res) => {
-                          console.log('Save detail');
-                          const detail = res.data;
-                          todo.details.push(detail);
-                      });
-                      this.detailInput = '';
-                  } else {
-                      console.log('Nothing to submit')
-                  }
-              },
-          },
-          created: function () {
-              let url = "{% url "accounts:profile" "foobar" %}";
-              if ("{{ user.is_authenticated }}" === "True") {
-                  url = url.replace("foobar", "{{ user.username }}");
-                  axios.get(url)
-                      .then((res) => {
-                          this.lists = res.data.lists;
-                      });
-              }
-          },
-      });
+    axios.defaults.xsrfCookieName = 'csrftoken';
+    axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+    const app = new Vue({
+      delimiters: ['[[', ']]'],
+      el: '#app',
+      data: {
+        lists: [],
+        todoInput: '',
+        detailInput: '',
+        selectedList: [],
+      },
+      methods: {
+        createTodo: function (list) {
+          if (this.todoInput) {
+            axios.post("{% url 'todos:todos_list' %}", {
+              title: this.todoInput,
+              list: list.id,
+            }).then((res) => {
+              console.log('Save todo');
+              const todo = res.data;
+              list.todos.push(todo);
+            });
+            this.todoInput = '';
+          } else {
+            console.log('Nothing to submit')
+          }
+        },
+        createDetail: function (todo) {
+          if (this.detailInput) {
+            let url = "{% url 'todos:details_list' 0 %}";
+            url = url.replace('0', `${todo.id}`);
+            axios.post(url, {
+              content: this.detailInput,
+              todo: todo.id,
+            }).then((res) => {
+              console.log('Save detail');
+              const detail = res.data;
+              todo.details.push(detail);
+            });
+            this.detailInput = '';
+          } else {
+            console.log('Nothing to submit')
+          }
+        },
+        selectList: function (list) {
+          this.selectedList = list
+        }
+      },
+      created: function () {
+        let url = "{% url "accounts:profile" "foobar" %}";
+        if ("{{ user.is_authenticated }}" === "True") {
+          url = url.replace("foobar", "{{ user.username }}");
+          axios.get(url)
+            .then(res => {
+              this.lists = res.data.lists;
+            })
+            .then(res => this.selectedList = this.lists[0]);
+        }
+      },
+    });
   </script>
 {% endblock %}
