@@ -1,8 +1,11 @@
 #app {
     min-height: 100vh;
-    padding: 0;
     margin: 0;
-    background-color: #0a0a0a;
+    background-color: #0F1A26;
+}
+
+#app .container {
+    padding-top: 5vh;
 }
 
 /* Nav */
@@ -12,11 +15,15 @@ nav {
 
 .navbar-brand .navbar-item {
     font-family: "Gugi", cursvie;
+    width: 150px;
+}
+
+a.navbar-item:hover {
+    background-color: white;
 }
 
 .navbar-end .navbar-item {
-    font-family: "Noto Sans KR", sans-serif;
-    font-weight: 400;
+    font-family: "Gugi", cursvie;
 }
 
 /* Signup */
@@ -52,13 +59,26 @@ nav {
     font-weight: 400;
 }
 
+.field .button {
+    margin-top: 10px;
+}
+
 /* Footer */
 .footer {
     padding: 2rem;
     padding-top: 3rem;
+    background-color: #0F1A26;
 }
 
 /* Hero */
 .hero-body {
     font-family: "Gugi", cursvie;
+}
+
+.hero h1.title {
+    margin-bottom: 2.5rem;
+}
+
+.hero h1.title {
+    margin-bottom: 2.5rem;
 }
