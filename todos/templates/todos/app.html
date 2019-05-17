@@ -1,18 +1,22 @@
 {% extends 'base.html' %}
 {% block app %}
-  <div class="container is-fluid">
+  <div class="container is-fluid" v-if="">
     <div class="tile is-ancestor">
       <div class="tile is-2 is-vertical is-parent">
         <div class="tile is-child box">
-          <p class="title">{{ user.username }}</p>
+          <div class="title">{{ user.username }}</div>
+          <a class="button is-dark is-inverted is-fullwidth" @click="toggleInput" style="margin-top: auto">
+            <i class="fas fa-plus" style="margin-right: 7px"></i> add new
+          </a>
+          <p class="menu-label">
+            Todo List
+          </p>
           <ul>
-            <li
-                    class="button is-dark is-fullwidth"
-                    :class="{ 'is-inverted': list != selectedList, 'is-outlined': list == selectedList }"
-                    v-for="list in lists"
-                    @click="selectList(list)"
-                    style="margin-top: 10px;"
-            >
+            <li class="button is-dark is-fullwidth"
+                :class="{ 'is-inverted': list != selectedList, 'is-disable': list == selectedList }"
+                v-for="list in lists"
+                @click="selectList(list)"
+                style="margin-top: 10px;">
               [[ list.title ]]
             </li>
           </ul>
@@ -21,8 +25,8 @@
       <div class="tile is-parent">
         <div class="tile is-child box">
           <p class="title">[[ selectedList.title ]]</p>
-          <input class="input" type="text" v-model="todoInput" placeholder="할 일 추가..."
-                 @keydown.enter="createTodo(selectedList)">
+          <input class="input" type="text" v-model="todoInput" placeholder="Add todo..."
+                 @keyup.enter="createTodo(selectedList)">
           <aside class="menu" v-show="selectedList.todos" style="margin-top: 10px;">
             <ul class="menu-list">
               <li v-for="todo in selectedList.todos" v-show="!todo.checked">
@@ -35,7 +39,7 @@
             <ul class="menu-list">
               <li v-for="todo in selectedList.todos" v-show="todo.checked">
                 {#add vue method and django view action#}
-                <a>
+                <a class="has-background-grey-lighter">
                   <input type="checkbox" v-model="todo.checked">
                   [[ todo.title ]]
                 </a>
@@ -44,6 +48,18 @@
           </aside>
         </div>
       </div>
+    </div>
+  </div>
+  <!-- Modal -->
+  <div class="modal" :class="{'is-active':toggle}">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <section class="modal-card-body">
+        <p class="title">New list</p>
+        <input class="input" type="text" placeholder="title input" v-model="listInput" style="margin-bottom: 20px">
+        <button class="button is-info" @click="createList">Add</button>
+        <button class="button" @click="toggleInput">Cancel</button>
+      </section>
     </div>
   </div>
   {#  <input type="text" v-model="detailInput" placeholder="디테일 추가..." @keydown.enter="createDetail(todo)">#}
@@ -60,11 +76,35 @@
       el: '#app',
       data: {
         lists: [],
+        listInput: '',
         todoInput: '',
         detailInput: '',
         selectedList: [],
+        toggle: false,
       },
       methods: {
+        toggleInput: function () {
+          if (this.toggle) {
+            this.toggle = false;
+            this.listInput = '';
+          } else this.toggle = true;
+        },
+        createList: function () {
+          if (this.listInput) {
+            axios.post("{% url 'todos:lists_list' %}", {
+              title: this.listInput,
+            }).then((res) => {
+              console.log('Save list');
+              const list = res.data;
+              this.lists.push(list);
+              this.selectedList = list;
+            });
+            this.listInput = '';
+            this.toggle = false;
+          } else {
+            console.log('Nothing to submit')
+          }
+        },
         createTodo: function (list) {
           if (this.todoInput) {
             axios.post("{% url 'todos:todos_list' %}", {
