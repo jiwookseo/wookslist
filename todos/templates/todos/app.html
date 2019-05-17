@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block app %}
-  <div class="container is-fluid" v-if="">
+  <div class="container is-fluid" v-if="'{{ user.is_authenticated }}' == 'True'">
     <div class="tile is-ancestor">
       <div class="tile is-2 is-vertical is-parent">
         <div class="tile is-child box">
@@ -9,7 +9,7 @@
             <i class="fas fa-plus" style="margin-right: 7px"></i> add new
           </a>
           <p class="menu-label">
-            Todo List
+            todo lists
           </p>
           <ul>
             <li class="button is-dark is-fullwidth"
@@ -50,6 +50,31 @@
       </div>
     </div>
   </div>
+  <section class="hero is-fullheight is-primary is-bold" v-else>
+    <div class="hero-body">
+      <div class="container">
+        <div class="columns">
+          <div class="column is-one-third">
+
+          </div>
+          <div class="column">
+            <h1 class="title">
+              ㅇㅅㄹㅅㅌ Wookslist
+            </h1>
+            <h2 class="subtitle">
+              Plan Your Life and Never Be Stuck Again
+            </h2>
+            <a class="button is-light is-medium " href="{% url 'accounts:signup' %}">
+              <span>Sign up, and join us</span>
+            </a>
+            <a class="button is-light is-outlined is-medium" href="{% url 'accounts:login' %}">
+              <span>Login</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
   <!-- Modal -->
   <div class="modal" :class="{'is-active':toggle}">
     <div class="modal-background"></div>

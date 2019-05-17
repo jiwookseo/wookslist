@@ -6,17 +6,8 @@
 }
 
 /* Nav */
-
-#nav .menu-list {
-    position: absolute;
-    top: 9.6px;
-    right: 0;
-    width: 12vw;
-}
-
-.search-movie {
-    background-color: white;
-    margin: 1px;
+nav {
+    padding-bottom: 1vh;
 }
 
 .navbar-brand .navbar-item {
@@ -59,4 +50,15 @@
 .login .label {
     color: #fff;
     font-weight: 400;
+}
+
+/* Footer */
+.footer {
+    padding: 2rem;
+    padding-top: 3rem;
+}
+
+/* Hero */
+.hero-body {
+    font-family: "Gugi", cursvie;
 }
