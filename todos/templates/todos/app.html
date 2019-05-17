@@ -12,8 +12,8 @@
             todo lists
           </p>
           <ul>
-            <li class="button is-dark is-fullwidth"
-                :class="{ 'is-inverted': list != selectedList, 'is-disable': list == selectedList }"
+            <li class="button is-fullwidth"
+                :class="{ 'is-dark is-inverted': list != selectedList, 'is-primary is-disable': list == selectedList }"
                 v-for="list in lists"
                 @click="selectList(list)"
                 style="margin-top: 10px;">
