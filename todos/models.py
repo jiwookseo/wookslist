@@ -14,6 +14,7 @@ class Todo(models.Model):
     title = models.CharField(max_length=100)
     check = models.BooleanField(default=False)
     deadline = models.DateTimeField(blank=True, null=True)
+    important = models.BooleanField(default=False)
     list = models.ForeignKey(List, on_delete=models.CASCADE, related_name="todos")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
