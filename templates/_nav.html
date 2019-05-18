@@ -20,26 +20,26 @@
       <div class="navbar-end">
         {% if user.is_active %}
           <span class="navbar-item">
-        <a class="button is-primary is-outlined" href="{% url 'accounts:logout' %}">
-          <span>Logout</span>
-        </a>
-      </span>
+            <a class="button is-primary is-outlined" href="{% url 'accounts:logout' %}">
+              <span>Logout</span>
+            </a>
+          </span>
           <span class="navbar-item">
-        <a class="button is-primary" href="{% url 'todos:index' %}">
-          <span>sign in by {{ user.username }}</span>
-        </a>
-      </span>
+            <a class="button is-primary" href="{% url 'todos:index' %}">
+              <span>sign in by {{ user.username }}</span>
+            </a>
+          </span>
         {% else %}
           <span class="navbar-item">
-        <a class="button is-primary is-outlined" href="{% url 'accounts:signup' %}">
-          <span>Sign up</span>
-        </a>
-      </span>
+            <a class="button is-primary is-outlined" href="{% url 'accounts:signup' %}">
+              <span>Sign up</span>
+            </a>
+          </span>
           <span class="navbar-item">
-        <a class="button is-primary" href="{% url 'accounts:login' %}">
-          <span>Login</span>
-        </a>
-      </span>
+            <a class="button is-primary" href="{% url 'accounts:login' %}">
+              <span>Login</span>
+            </a>
+          </span>
         {% endif %}
       </div>
     </div>
