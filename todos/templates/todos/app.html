@@ -28,22 +28,48 @@
           <input class="input" type="text" v-model="todoInput" placeholder="Add todo..."
                  @keyup.enter="createTodo(selectedList)">
           <aside class="menu" v-show="selectedList.todos" style="margin-top: 10px;">
+            <p class="menu-label" v-show="stared.length">
+              Important
+            </p>
             <ul class="menu-list">
-              <li v-for="todo in notFinished">
+              <li v-for="todo in stared">
                 <a>
-                  <input type="text" v-model="todo.check" @click="check(todo)">
+                  <span class="has-text-primary" @click="important(todo)"><i class="fas fa-star"></i></span>
+                  <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-square"></i></span>
                   [[ todo.title ]]
                 </a>
               </li>
             </ul>
-            <p class="menu-label" v-show="finished.length">
+            <p class="menu-label">
+              Todos
+            </p>
+            <ul class="menu-list">
+              <li v-for="todo in notFinished">
+                <a>
+                  <span @click="important(todo)"><i class="far fa-star"></i></span>
+                  <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-square"></i></span>
+                  [[ todo.title ]]
+                </a>
+              </li>
+            </ul>
+            <p class="menu-label" v-show="finished.length + staredFinished.length">
               Finished
             </p>
+            <ul class="menu-list" v-show="staredFinished.length">
+              <li v-for="todo in staredFinished">
+                <a>
+                  <span class="has-text-primary" @click="important(todo)"><i class="fas fa-star"></i></span>
+                  <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-check-square"></i></span>
+                  <s>[[ todo.title ]]</s>
+                </a>
+              </li>
+            </ul>
             <ul class="menu-list" v-show="finished.length">
               <li v-for="todo in finished">
-                <a class="has-background-grey-lighter">
-                  <input type="text" v-model="todo.check" @click="check(todo)">
-                  [[ todo.title ]]
+                <a>
+                  <span @click="important(todo)"><i class="far fa-star"></i></span>
+                  <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-check-square"></i></span>
+                  <s>[[ todo.title ]]</s>
                 </a>
               </li>
             </ul>
@@ -98,117 +124,133 @@
     axios.defaults.xsrfCookieName = 'csrftoken';
     axios.defaults.xsrfHeaderName = 'X-CSRFToken';
     const app = new Vue({
-        delimiters: ['[[', ']]'],
-        el: '#app',
-        data: {
-          lists: [],
-          selectedList: [],
-          listInput: '',
-          todoInput: '',
-          detailInput: '',
-          notFinished: [],
-          finished: [],
-          toggle: false,
+      delimiters: ['[[', ']]'],
+      el: '#app',
+      data: {
+        lists: [],
+        selectedList: [],
+        listInput: '',
+        todoInput: '',
+        detailInput: '',
+        toggle: false,
+      },
+      methods: {
+        toggleInput: function () {
+          if (this.toggle) {
+            this.toggle = false;
+            this.listInput = '';
+          } else this.toggle = true;
         },
-        methods: {
-          toggleInput: function () {
-            if (this.toggle) {
-              this.toggle = false;
-              this.listInput = '';
-            } else this.toggle = true;
-          },
-          createList: function () {
-            if (this.listInput) {
-              axios.post("{% url 'todos:lists_list' %}", {
-                title: this.listInput,
-              }).then((res) => {
-                console.log('Save list');
-                const list = res.data;
-                this.lists.push(list);
-                this.finished = [];
-                this.notFinished = [];
-                this.selectedList = list;
-              });
-              this.listInput = '';
-              this.toggle = false;
-            } else {
-              console.log('Nothing to submit')
-            }
-          },
-          createTodo: function (list) {
-            if (this.todoInput) {
-              axios.post("{% url 'todos:todos_list' %}", {
-                title: this.todoInput,
-                list: list.id,
-              }).then((res) => {
-                console.log('Save todo');
-                const todo = res.data;
-                list.todos.push(todo);
-              });
-              this.todoInput = '';
-            } else {
-              console.log('Nothing to submit')
-            }
-          },
-          createDetail: function (todo) {
-            if (this.detailInput) {
-              let url = "{% url 'todos:details_list' 0 %}";
-              url = url.replace('0', `${todo.id}`);
-              axios.post(url, {
-                content: this.detailInput,
-                todo: todo.id,
-              }).then((res) => {
-                console.log('Save detail');
-                const detail = res.data;
-                todo.details.push(detail);
-              });
-              this.detailInput = '';
-            } else {
-              console.log('Nothing to submit')
-            }
-          },
-          selectList: function (list) {
-            this.finished = [];
-            this.notFinished = [];
-            this.selectedList = list;
-            list.todos.forEach(todo => {
-              if (todo.check) {
-                this.finished.push(todo)
-              } else {
-                this.notFinished.push(todo)
-              }
+        createList: function () {
+          if (this.listInput) {
+            axios.post("{% url 'todos:lists_list' %}", {
+              title: this.listInput,
+            }).then((res) => {
+              console.log('Save list');
+              const list = res.data;
+              this.lists.push(list);
+              this.selectedList = list;
+            });
+            this.listInput = '';
+            this.toggle = false;
+          } else {
+            console.log('Nothing to submit')
+          }
+        },
+        createTodo: function (list) {
+          if (this.todoInput) {
+            axios.post("{% url 'todos:todos_list' %}", {
+              title: this.todoInput,
+              list: list.id,
+            }).then((res) => {
+              console.log('Save todo');
+              const todo = res.data;
+              list.todos.push(todo);
+            });
+            this.todoInput = '';
+          } else {
+            console.log('Nothing to submit')
+          }
+        },
+        createDetail: function (todo) {
+          if (this.detailInput) {
+            let url = "{% url 'todos:details_list' 0 %}";
+            url = url.replace('0', `${todo.id}`);
+            axios.post(url, {
+              content: this.detailInput,
+              todo: todo.id,
+            }).then((res) => {
+              console.log('Save detail');
+              const detail = res.data;
+              todo.details.push(detail);
+            });
+            this.detailInput = '';
+          } else {
+            console.log('Nothing to submit')
+          }
+        },
+        selectList: function (list) {
+          this.selectedList = list;
+        },
+        check: function (todo) {
+          axios.get("{% url 'todos:todos_check' 123 %}".replace('123', `${todo.id}`))
+            .then(res => todo.check = res.data.check);
+        },
+        important: function (todo) {
+          axios.get("{% url 'todos:todos_important' 123 %}".replace('123', `${todo.id}`))
+            .then(res => todo.important = res.data.important);
+        },
+        isStar: function (todo) {
+          if (todo.important) {
+            return 'far'
+          } else {
+            return 'fas'
+          }
+        },
+      },
+      created: function () {
+        let url = "{% url "accounts:profile" "foobar" %}";
+        if ("{{ user.is_authenticated }}" === "True") {
+          url = url.replace("foobar", "{{ user.username }}");
+          axios.get(url)
+            .then(res => {
+              this.lists = res.data.lists;
             })
-          },
-          check: function (todo) {
-            {#axios.get()#}
-            if (todo.check) {
-              this.notFinished.push(todo);
-              this.finished = this.finished.filter(item => item !== todo);
-              todo.check = false;
-            } else {
-              this.finished.push(todo);
-              this.notFinished = this.notFinished.filter(item => item !== todo);
-              todo.check = true;
-            }
+            .then(res => {
+              this.selectedList = this.lists[0];
+            });
+        }
+      },
+      computed: {
+        stared: function () {
+          if (this.selectedList && this.selectedList.todos) {
+            return this.selectedList.todos.filter(todo => todo.important && !todo.check)
+          } else {
+            return []
           }
         },
-        created: function () {
-          let url = "{% url "accounts:profile" "foobar" %}";
-          if ("{{ user.is_authenticated }}" === "True") {
-            url = url.replace("foobar", "{{ user.username }}");
-            axios.get(url)
-              .then(res => {
-                this.lists = res.data.lists;
-              })
-              .then(res => {
-                this.selectedList = this.lists[0];
-                this.selectedList.todos.forEach(todo => {
-                  if (todo.checked) this.finished.push(todo); else this.notFinished.push(todo);
-                })
-              });
+        notFinished: function () {
+          if (this.selectedList && this.selectedList.todos) {
+            return this.selectedList.todos.filter(todo => !todo.important && !todo.check)
+          } else {
+            return []
           }
         },
-      })
-    ;
+        staredFinished: function () {
+          if (this.selectedList && this.selectedList.todos) {
+            return this.selectedList.todos.filter(todo => todo.important && todo.check)
+          } else {
+            return []
+          }
+        },
+        finished: function () {
+          if (this.selectedList && this.selectedList.todos) {
+            return this.selectedList.todos.filter(todo => !todo.important && todo.check)
+          } else {
+            return []
+          }
+        },
+      }
+    });
   </script>
 {% endblock %}
