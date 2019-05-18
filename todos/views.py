@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -88,3 +89,25 @@ def details_detail(request, pk):
                 return Response({"message": "삭제되었습니다."}, status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+@api_view(["GET"])
+def todos_check(request, pk):
+    todo = get_object_or_404(Todo, pk=pk)
+    if request.user == todo.list.user:
+        todo.check = not todo.check
+        todo.save()
+        return JsonResponse({'check': todo.check})
+    else:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+@api_view(["GET"])
+def todos_important(request, pk):
+    todo = get_object_or_404(Todo, pk=pk)
+    if request.user == todo.list.user:
+        todo.important = not todo.important
+        todo.save()
+        return JsonResponse({'important': todo.important})
+    else:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+

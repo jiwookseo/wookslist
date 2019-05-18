@@ -9,6 +9,8 @@ urlpatterns = [
     path('lists/<int:pk>/', views.lists_detail, name="lists_detail"),
     path('todos/', views.todos_list, name="todos_list"),
     path('todos/<int:pk>/', views.todos_detail, name="todos_detail"),
+    path('todos/<int:pk>/check/', views.todos_check, name="todos_check"),
+    path('todos/<int:pk>/important/', views.todos_important, name="todos_important"),
     path('todos/<int:pk>/details/', views.details_list, name="details_list"),
     path('details/<int:pk>/', views.details_detail, name="details_detail"),
 ]
