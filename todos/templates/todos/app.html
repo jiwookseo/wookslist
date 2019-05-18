@@ -3,6 +3,7 @@
   <div class="container is-fluid" v-if="'{{ user.is_authenticated }}' == 'True'">
     <div class="tile is-ancestor">
       <div class="tile is-2 is-vertical is-parent">
+        <!-- List Menu -->
         <div class="tile is-child box">
           <div class="title">{{ user.username }}</div>
           <a class="button is-dark is-inverted is-fullwidth" @click="toggleInput" style="margin-top: auto">
@@ -22,6 +23,7 @@
           </ul>
         </div>
       </div>
+      <!-- Selected List -->
       <div class="tile is-parent">
         <div class="tile is-child box" v-if="!selectedList.todos">
           <p class="title">Create new list</p>
@@ -30,14 +32,17 @@
           </a>
         </div>
         <div class="tile is-child box" v-else>
+          <!-- List Title -->
           <p class="title">[[ selectedList.title ]]
             <span style="font-size: 1rem; margin: 5px;" @click="toggleTitle">
               <i class="far fa-edit"></i></span>
             <span style="font-size: 1rem;" @click="deleteList">
               <i class="far fa-trash-alt"></i></span>
           </p>
+          <!-- Todos Input -->
           <input class="input" type="text" v-model="todoInput" placeholder="Add todo..."
                  @keyup.enter="createTodo(selectedList)">
+          <!-- No Todos -->
           <aside class="menu" v-if="!selectedList.todos.length" style="margin-top: 10px;">
             <div class="div" style="margin-top: 30px">
               <span>
@@ -46,47 +51,53 @@
               </span>
             </div>
           </aside>
+          <!-- Todos -->
           <aside class="menu" v-else style="margin-top: 10px;">
-            <p class="menu-label"></p>
+            <p class="menu-label"></p> <!-- for first-label margin control -->
+            <!-- Stared & Not Finished -->
             <p class="menu-label" v-show="stared.length">
               Important
             </p>
             <ul class="menu-list">
               <li v-for="todo in stared">
-                <a>
+                <a @click="toggleTodo(todo)">
                   <span class="has-text-primary" @click="important(todo)"><i class="fas fa-star"></i></span>
                   <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-square"></i></span>
                   [[ todo.title ]]
                 </a>
               </li>
             </ul>
+            <!-- Not Finished -->
             <p class="menu-label" v-show="notFinished.length">
               Todos
             </p>
             <ul class="menu-list">
               <li v-for="todo in notFinished">
-                <a>
+                <a @click="toggleTodo(todo)">
                   <span @click="important(todo)"><i class="far fa-star"></i></span>
                   <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-square"></i></span>
                   [[ todo.title ]]
                 </a>
               </li>
             </ul>
+            <!-- Finished -->
             <p class="menu-label" v-show="finished.length || staredFinished.length">
               Finished
             </p>
+            <!-- Stared & Finished -->
             <ul class="menu-list" v-show="staredFinished.length">
               <li v-for="todo in staredFinished">
-                <a>
+                <a @click="toggleTodo(todo)">
                   <span class="has-text-primary" @click="important(todo)"><i class="fas fa-star"></i></span>
                   <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-check-square"></i></span>
                   <s>[[ todo.title ]]</s>
                 </a>
               </li>
             </ul>
+            <!-- Not Stared & Finished -->
             <ul class="menu-list" v-show="finished.length">
               <li v-for="todo in finished">
-                <a>
+                <a @click="toggleTodo(todo)">
                   <span @click="important(todo)"><i class="far fa-star"></i></span>
                   <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-check-square"></i></span>
                   <s>[[ todo.title ]]</s>
@@ -98,6 +109,38 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal -->
+  <div class="modal" :class="{'is-active':toggle}">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <!-- Add List Modal -->
+      <section class="modal-card-body" v-show="toggleType==='input'">
+        <p class="title">New list</p>
+        <input class="input" type="text" placeholder="title input" v-model="listInput" @keydown.enter="createList"
+               style="margin-bottom: 20px">
+        <button class="button is-primary" @click="createList">Add</button>
+        <button class="button" @click="toggleInput">Cancel</button>
+      </section>
+      <!-- Edit Title Modal -->
+      <section class="modal-card-body" v-show="toggleType==='title'">
+        <p class="title">Edit title</p>
+        <input class="input" type="text" placeholder="title input" v-model="changeTitle" @keydown.enter="changeList"
+               style="margin-bottom: 20px">
+        <button class="button is-primary" @click="changeList">Update</button>
+        <button class="button" @click="toggleTitle">Cancel</button>
+      </section>
+      <!-- Todos Detail Modal -->
+      <section class="modal-card-body" v-show="toggleType==='todo'">
+        <p class="title">[[ selectedTodo.title ]]</p>
+        [[ selectedTodo ]]
+        <button class="button is-primary" @click="changeTodo">Update</button>
+        <button class="button" @click="toggleTodo(selectedTodo)">Cancel</button>
+      </section>
+    </div>
+  </div>
+
+  <!-- Main Page for Anonymous User -->
   <section class="hero is-fullheight is-primary is-bold" v-else>
     <div class="hero-body">
       <div class="container">
@@ -122,30 +165,6 @@
       </div>
     </div>
   </section>
-  <!-- Modal -->
-  <div class="modal" :class="{'is-active':toggle}">
-    <div class="modal-background"></div>
-    <div class="modal-card">
-      <section class="modal-card-body" v-show="toggleType==='input'">
-        <p class="title">New list</p>
-        <input class="input" type="text" placeholder="title input" v-model="listInput" @keydown.enter="createList"
-               style="margin-bottom: 20px">
-        <button class="button is-primary" @click="createList">Add</button>
-        <button class="button" @click="toggleInput">Cancel</button>
-      </section>
-      <section class="modal-card-body" v-show="toggleType==='title'">
-        <p class="title">Edit title</p>
-        <input class="input" type="text" placeholder="title input" v-model="changeTitle" @keydown.enter="changeList"
-               style="margin-bottom: 20px">
-        <button class="button is-primary" @click="changeList">Update</button>
-        <button class="button" @click="toggleTitle">Cancel</button>
-      </section>
-    </div>
-  </div>
-  {#  <input type="text" v-model="detailInput" placeholder="디테일 추가..." @keydown.enter="createDetail(todo)">#}
-  {#  <ul v-show="todo.details">#}
-  {#    <li v-for="detail in todo.details">[[ detail.content ]]</li>#}
-  {#  </ul>#}
 {% endblock %}
 {% block script %}
   <script>
@@ -157,6 +176,7 @@
       data: {
         lists: [],
         selectedList: [],
+        selectedTodo: [],
         listInput: '',
         todoInput: '',
         detailInput: '',
@@ -165,6 +185,16 @@
         toggleType: '',
       },
       methods: {
+        toggleTodo: function (todo) {
+          if (this.toggle) {
+            this.toggle = false;
+            this.toggleType = ''
+          } else {
+            this.toggle = true;
+            this.toggleType = 'todo';
+            this.selectedTodo = todo;
+          }
+        },
         toggleTitle: function () {
           if (this.toggle) {
             this.toggle = false;
@@ -242,6 +272,13 @@
         important: function (todo) {
           axios.get("{% url 'todos:todos_important' 123 %}".replace('123', `${todo.id}`))
             .then(res => todo.important = res.data.important);
+        },
+        changeTodo: function () {
+          axios.get(
+            "{% url 'todos:todos_detail' 123 %}".replace('123', `${this.selectedTodo.id}`))
+            .then(res => {
+              console.log(res.data);
+            });
         },
         changeList: function () {
           axios.patch(
