@@ -24,11 +24,25 @@ def lists_list(request):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
-@api_view(["GET"])
+@api_view(["GET", "PATCH", "DELETE"])
 def lists_detail(request, pk):
     list_item = get_object_or_404(List, pk=pk)
-    serializer = ListSerializer(list_item)
-    return Response(serializer.data)
+    if request.method == 'GET':
+        serializer = ListSerializer(list_item)
+        return Response(serializer.data)
+    else:
+        if request.user == list_item.user:
+            if request.method == 'PATCH':
+                request.data['user'] = request.user.id
+                serializer = ListSerializer(list_item, data=request.data)
+                if serializer.is_valid(raise_exception=True):
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+            elif request.method == 'DELETE':
+                list_item.delete()
+                return Response({"message": "삭제되었습니다."}, status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(["GET", "POST"])
@@ -47,11 +61,25 @@ def todos_list(request):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
-@api_view(["GET"])
+@api_view(["GET", "DELETE", "PUT"])
 def todos_detail(request, pk):
     todo = get_object_or_404(Todo, pk=pk)
-    serializer = TodoSerializer(todo)
-    return Response(serializer.data)
+    if request.method == 'GET':
+        serializer = TodoSerializer(todo)
+        return Response(serializer.data)
+    else:
+        if request.user == todo.list.user:
+            if request.method == 'PUT':
+                serializer = TodoSerializer(todo, data=request.data)
+                if serializer.is_valid(raise_exception=True):
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+            elif request.method == 'DELETE':
+                todo.delete()
+                return Response({"message": "삭제되었습니다."}, status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
 
 
 @api_view(["GET", "POST"])
@@ -101,6 +129,7 @@ def todos_check(request, pk):
     else:
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
+
 @api_view(["GET"])
 def todos_important(request, pk):
     todo = get_object_or_404(Todo, pk=pk)
@@ -110,4 +139,3 @@ def todos_important(request, pk):
         return JsonResponse({'important': todo.important})
     else:
         return Response(status=status.HTTP_401_UNAUTHORIZED)
-

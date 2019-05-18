@@ -8,7 +8,7 @@
           <a class="button is-dark is-inverted is-fullwidth" @click="toggleInput" style="margin-top: auto">
             <i class="fas fa-plus" style="margin-right: 7px"></i> add new
           </a>
-          <p class="menu-label">
+          <p class="menu-label" v-if="lists.length">
             todo lists
           </p>
           <ul>
@@ -23,11 +23,31 @@
         </div>
       </div>
       <div class="tile is-parent">
-        <div class="tile is-child box">
-          <p class="title">[[ selectedList.title ]]</p>
+        <div class="tile is-child box" v-if="!selectedList.todos">
+          <p class="title">Create new list</p>
+          <a class="button is-dark is-inverted is-fullwidth" @click="toggleInput" style="margin-top: auto">
+            <i class="fas fa-plus" style="margin-right: 7px"></i> add new
+          </a>
+        </div>
+        <div class="tile is-child box" v-else>
+          <p class="title">[[ selectedList.title ]]
+            <span style="font-size: 1rem; margin: 5px;" @click="toggleTitle">
+              <i class="far fa-edit"></i></span>
+            <span style="font-size: 1rem;" @click="deleteList">
+              <i class="far fa-trash-alt"></i></span>
+          </p>
           <input class="input" type="text" v-model="todoInput" placeholder="Add todo..."
                  @keyup.enter="createTodo(selectedList)">
-          <aside class="menu" v-show="selectedList.todos" style="margin-top: 10px;">
+          <aside class="menu" v-if="!selectedList.todos.length" style="margin-top: 10px;">
+            <div class="div" style="margin-top: 30px">
+              <span>
+                <i class="fas fa-arrow-up" style="margin: 0 10px"></i>
+                Input something to do, and press enter key
+              </span>
+            </div>
+          </aside>
+          <aside class="menu" v-else style="margin-top: 10px;">
+            <p class="menu-label"></p>
             <p class="menu-label" v-show="stared.length">
               Important
             </p>
@@ -40,7 +60,7 @@
                 </a>
               </li>
             </ul>
-            <p class="menu-label">
+            <p class="menu-label" v-show="notFinished.length">
               Todos
             </p>
             <ul class="menu-list">
@@ -52,7 +72,7 @@
                 </a>
               </li>
             </ul>
-            <p class="menu-label" v-show="finished.length + staredFinished.length">
+            <p class="menu-label" v-show="finished.length || staredFinished.length">
               Finished
             </p>
             <ul class="menu-list" v-show="staredFinished.length">
@@ -91,7 +111,7 @@
             <h2 class="subtitle">
               Plan Your Life and Never Be Stuck Again
             </h2>
-            <a class="button is-light is-medium " href="{% url 'accounts:signup' %}">
+            <a class="button is-light is-medium" href="{% url 'accounts:signup' %}">
               <span>Sign up, and join us</span>
             </a>
             <a class="button is-light is-outlined is-medium" href="{% url 'accounts:login' %}">
@@ -106,11 +126,19 @@
   <div class="modal" :class="{'is-active':toggle}">
     <div class="modal-background"></div>
     <div class="modal-card">
-      <section class="modal-card-body">
+      <section class="modal-card-body" v-show="toggleType==='input'">
         <p class="title">New list</p>
-        <input class="input" type="text" placeholder="title input" v-model="listInput" style="margin-bottom: 20px">
-        <button class="button is-info" @click="createList">Add</button>
+        <input class="input" type="text" placeholder="title input" v-model="listInput" @keydown.enter="createList"
+               style="margin-bottom: 20px">
+        <button class="button is-primary" @click="createList">Add</button>
         <button class="button" @click="toggleInput">Cancel</button>
+      </section>
+      <section class="modal-card-body" v-show="toggleType==='title'">
+        <p class="title">Edit title</p>
+        <input class="input" type="text" placeholder="title input" v-model="changeTitle" @keydown.enter="changeList"
+               style="margin-bottom: 20px">
+        <button class="button is-primary" @click="changeList">Update</button>
+        <button class="button" @click="toggleTitle">Cancel</button>
       </section>
     </div>
   </div>
@@ -132,14 +160,29 @@
         listInput: '',
         todoInput: '',
         detailInput: '',
+        changeTitle: '',
         toggle: false,
+        toggleType: '',
       },
       methods: {
+        toggleTitle: function () {
+          if (this.toggle) {
+            this.toggle = false;
+            this.toggleType = ''
+          } else {
+            this.toggle = true;
+            this.toggleType = 'title';
+            this.changeTitle = this.selectedList.title;
+          }
+        },
         toggleInput: function () {
           if (this.toggle) {
             this.toggle = false;
-            this.listInput = '';
-          } else this.toggle = true;
+            this.toggleType = ''
+          } else {
+            this.toggle = true;
+            this.toggleType = 'input'
+          }
         },
         createList: function () {
           if (this.listInput) {
@@ -165,7 +208,7 @@
             }).then((res) => {
               console.log('Save todo');
               const todo = res.data;
-              list.todos.push(todo);
+              list.todos.unshift(todo);
             });
             this.todoInput = '';
           } else {
@@ -200,11 +243,27 @@
           axios.get("{% url 'todos:todos_important' 123 %}".replace('123', `${todo.id}`))
             .then(res => todo.important = res.data.important);
         },
-        isStar: function (todo) {
-          if (todo.important) {
-            return 'far'
-          } else {
-            return 'fas'
+        changeList: function () {
+          axios.patch(
+            "{% url 'todos:lists_detail' 123 %}".replace('123', `${this.selectedList.id}`),
+            {'title': this.changeTitle})
+            .then(res => {
+              this.selectedList.title = res.data.title;
+              this.changeTitle = '';
+            });
+        },
+        deleteList: function () {
+          const result = confirm(`"${this.selectedList.title}" will be deleted forever.`);
+          if (result) {
+            axios.delete("{% url 'todos:lists_detail' 123 %}".replace('123', `${this.selectedList.id}`))
+              .then(res => {
+                this.lists = this.lists.filter(list => list !== this.selectedList);
+                if (this.lists.length) {
+                  this.selectedList = this.lists[0];
+                } else {
+                  this.selectedList = [];
+                }
+              })
           }
         },
       },
@@ -217,7 +276,11 @@
               this.lists = res.data.lists;
             })
             .then(res => {
-              this.selectedList = this.lists[0];
+              if (this.lists.length) {
+                this.selectedList = this.lists[0];
+              } else {
+                this.selectedList = [];
+              }
             });
         }
       },
