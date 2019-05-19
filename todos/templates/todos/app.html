@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load bulma_tags %}
 {% block app %}
   <div class="container is-fluid" v-if="'{{ user.is_authenticated }}' == 'True'">
     <div class="tile is-ancestor">
@@ -34,10 +35,10 @@
         <div class="tile is-child box" v-else>
           <!-- List Title -->
           <p class="title">[[ selectedList.title ]]
-            <span style="font-size: 1rem; margin: 5px;" @click="toggleTitle">
-              <i class="far fa-edit"></i></span>
-            <span style="font-size: 1rem;" @click="deleteList">
-              <i class="far fa-trash-alt"></i></span>
+            <a style="font-size: 1rem; margin: 5px;" @click="toggleTitle" class="has-text-black">
+              <i class="far fa-edit"></i></a>
+            <a style="font-size: 1rem;" @click="deleteList" class="has-text-black">
+              <i class="far fa-trash-alt"></i></a>
           </p>
           <!-- Todos Input -->
           <input class="input" type="text" v-model="todoInput" placeholder="Add todo..."
@@ -60,10 +61,10 @@
             </p>
             <ul class="menu-list">
               <li v-for="todo in stared">
-                <a @click="toggleTodo(todo)">
+                <a>
                   <span class="has-text-primary" @click="important(todo)"><i class="fas fa-star"></i></span>
-                  <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-square"></i></span>
-                  [[ todo.title ]]
+                  <span class="" @click="check(todo)" style="margin-right: 10px"><i class="far fa-square"></i></span>
+                  <span style="display: inline-block; width: 88%;" @click="toggleTodo(todo)">[[ todo.title ]]</span>
                 </a>
               </li>
             </ul>
@@ -73,10 +74,10 @@
             </p>
             <ul class="menu-list">
               <li v-for="todo in notFinished">
-                <a @click="toggleTodo(todo)">
+                <a>
                   <span @click="important(todo)"><i class="far fa-star"></i></span>
                   <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-square"></i></span>
-                  [[ todo.title ]]
+                  <span style="display: inline-block; width: 88%;" @click="toggleTodo(todo)">[[ todo.title ]]</span>
                 </a>
               </li>
             </ul>
@@ -87,56 +88,30 @@
             <!-- Stared & Finished -->
             <ul class="menu-list" v-show="staredFinished.length">
               <li v-for="todo in staredFinished">
-                <a @click="toggleTodo(todo)">
+                <a>
                   <span class="has-text-primary" @click="important(todo)"><i class="fas fa-star"></i></span>
                   <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-check-square"></i></span>
-                  <s>[[ todo.title ]]</s>
+                  <span style="display: inline-block; width: 88%;" @click="toggleTodo(todo)">
+                    <s>[[ todo.title ]]</s>
+                  </span>
                 </a>
               </li>
             </ul>
             <!-- Not Stared & Finished -->
             <ul class="menu-list" v-show="finished.length">
               <li v-for="todo in finished">
-                <a @click="toggleTodo(todo)">
+                <a>
                   <span @click="important(todo)"><i class="far fa-star"></i></span>
                   <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-check-square"></i></span>
-                  <s>[[ todo.title ]]</s>
+                  <span style="display: inline-block; width: 88%;" @click="toggleTodo(todo)">
+                    <s>[[ todo.title ]]</s>
+                  </span>
                 </a>
               </li>
             </ul>
           </aside>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- Modal -->
-  <div class="modal" :class="{'is-active':toggle}">
-    <div class="modal-background"></div>
-    <div class="modal-card">
-      <!-- Add List Modal -->
-      <section class="modal-card-body" v-show="toggleType==='input'">
-        <p class="title">New list</p>
-        <input class="input" type="text" placeholder="title input" v-model="listInput" @keydown.enter="createList"
-               style="margin-bottom: 20px">
-        <button class="button is-primary" @click="createList">Add</button>
-        <button class="button" @click="toggleInput">Cancel</button>
-      </section>
-      <!-- Edit Title Modal -->
-      <section class="modal-card-body" v-show="toggleType==='title'">
-        <p class="title">Edit title</p>
-        <input class="input" type="text" placeholder="title input" v-model="changeTitle" @keydown.enter="changeList"
-               style="margin-bottom: 20px">
-        <button class="button is-primary" @click="changeList">Update</button>
-        <button class="button" @click="toggleTitle">Cancel</button>
-      </section>
-      <!-- Todos Detail Modal -->
-      <section class="modal-card-body" v-show="toggleType==='todo'">
-        <p class="title">[[ selectedTodo.title ]]</p>
-        [[ selectedTodo ]]
-        <button class="button is-primary" @click="changeTodo">Update</button>
-        <button class="button" @click="toggleTodo(selectedTodo)">Cancel</button>
-      </section>
     </div>
   </div>
 
@@ -165,6 +140,66 @@
       </div>
     </div>
   </section>
+
+  <!-- Modal -->
+  <div class="modal" :class="{'is-active':toggle}">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <!-- Add List Modal -->
+      <section class="modal-card-body" v-show="toggleType==='input'">
+        <p class="title">New list</p>
+        <input class="input" type="text" placeholder="title input" v-model="listInput" @keydown.enter="createList"
+               style="margin-bottom: 20px">
+        <button class="button is-primary" @click="createList">Add</button>
+        <button class="button" @click="toggleInput">Cancel</button>
+      </section>
+      <!-- Edit Title Modal -->
+      <section class="modal-card-body" v-show="toggleType==='title'">
+        <p class="title">Edit title</p>
+        <input class="input" type="text" placeholder="title input" v-model="changeTitle" @keydown.enter="changeList"
+               style="margin-bottom: 20px">
+        <button class="button is-primary" @click="changeList">Update</button>
+        <button class="button" @click="toggleTitle">Cancel</button>
+      </section>
+      <!-- Todos Detail Modal -->
+      <section class="modal-card-body" v-show="toggleType==='todo'">
+        <p class="title" style="display: flex;">
+          [[ selectedTodo.title ]]
+          <span style="margin-left: auto;"></span>
+          <a style="font-size: 1.15rem; margin-right: 10px;" class="has-text-black" v-show="!edit" @click="edit=true">
+            <i class="far fa-edit"></i></a>
+          <a style="font-size: 1.15rem; margin-right: 12px;" class="has-text-black" @click="deleteTodo(selectedTodo)">
+            <i class="far fa-trash-alt"></i></a>
+          <button class="delete" aria-label="close" @click="toggleTodo(selectedTodo)"></button>
+        </p>
+        <div class="box" v-show="!edit">
+          view
+        </div>
+        <div class="box" v-show="edit">
+          <div class="field">
+            <p class="control has-icons-left has-icons-right">
+              <input class="input" type="email" placeholder="Set due date" v-model="selectedTodo.deadline">
+              <span class="icon is-small is-left">
+                <i class="fas fa-envelope"></i>
+              </span>
+            </p>
+          </div>
+          <div class="field">
+            <p class="control has-icons-left">
+              <input class="input" type="password" placeholder="Password">
+              <span class="icon is-small is-left">
+                <i class="fas fa-lock"></i>
+              </span>
+            </p>
+          </div>
+        </div>
+        <div>
+          <button class="button is-primary" v-show="edit" @click="changeTodo">Update</button>
+          <button class="button" v-show="edit" @click="edit=false">Cancel</button>
+        </div>
+      </section>
+    </div>
+  </div>
 {% endblock %}
 {% block script %}
   <script>
@@ -182,6 +217,7 @@
         detailInput: '',
         changeTitle: '',
         toggle: false,
+        edit: false,
         toggleType: '',
       },
       methods: {
@@ -239,6 +275,8 @@
               console.log('Save todo');
               const todo = res.data;
               list.todos.unshift(todo);
+              this.edit = true;
+              this.toggleTodo(todo);
             });
             this.todoInput = '';
           } else {
@@ -280,6 +318,18 @@
               console.log(res.data);
             });
         },
+        deleteTodo: function () {
+          const result = confirm(`"${this.selectedTodo.title}" will be deleted forever.`);
+          if (result) {
+            axios.delete("{% url 'todos:todos_detail' 123 %}".replace('123', `${this.selectedTodo.id}`))
+              .then(res => {
+                this.selectedList.todos = this.selectedList.todos.filter(todo => todo !== this.selectedTodo);
+                this.selectedTodo = [];
+                this.toggle = false;
+                this.toggleType = '';
+              })
+          }
+        },
         changeList: function () {
           axios.patch(
             "{% url 'todos:lists_detail' 123 %}".replace('123', `${this.selectedList.id}`),
@@ -287,6 +337,8 @@
             .then(res => {
               this.selectedList.title = res.data.title;
               this.changeTitle = '';
+              this.toggle = false;
+              this.toggleType = '';
             });
         },
         deleteList: function () {
