@@ -61,7 +61,7 @@ def todos_list(request):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
-@api_view(["GET", "DELETE", "PUT"])
+@api_view(["GET", "DELETE", "PATCH"])
 def todos_detail(request, pk):
     todo = get_object_or_404(Todo, pk=pk)
     if request.method == 'GET':
@@ -69,7 +69,7 @@ def todos_detail(request, pk):
         return Response(serializer.data)
     else:
         if request.user == todo.list.user:
-            if request.method == 'PUT':
+            if request.method == 'PATCH':
                 serializer = TodoSerializer(todo, data=request.data)
                 if serializer.is_valid(raise_exception=True):
                     serializer.save()
@@ -79,7 +79,6 @@ def todos_detail(request, pk):
                 return Response({"message": "삭제되었습니다."}, status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
-
 
 
 @api_view(["GET", "POST"])

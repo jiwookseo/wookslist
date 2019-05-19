@@ -174,7 +174,7 @@
           [[ selectedTodo.title ]]
           <span style="margin-left: auto;"></span>
           <a style="font-size: 1.15rem; margin-right: 10px;" class="has-text-black" v-show="!edit"
-             @click="edit=true; calendar.clear();">
+             @click="goEdit">
             <i class="far fa-edit"></i></a>
           <a style="font-size: 1.15rem; margin-right: 12px;" class="has-text-black" @click="deleteTodo(selectedTodo)">
             <i class="far fa-trash-alt"></i></a>
@@ -190,19 +190,19 @@
             <div class="field">
               <label class="label">Title</label>
               <div class="control">
-                <input class="input" type="text" placeholder="Title input" v-model="selectedTodo.title">
+                <input class="input" type="text" placeholder="Title input" v-model="editDetail.title">
               </div>
             </div>
             <div class="field">
               <label class="label">Content</label>
               <div class="control">
-                <textarea class="textarea" placeholder="Content input" v-model="selectedTodo.content"></textarea>
+                <textarea class="textarea" placeholder="Content input" v-model="editDetail.content"></textarea>
               </div>
             </div>
             <div class="field">
               <label class="label">Due Time</label>
               <div class="control" class="input">
-                <input ref='trigger' type='date' data-show-header="false" data-date-format="YYYY/MM/DD"
+                <input ref='trigger' type='date' data-show-header="false" data-date-format="YYYY-MM-DD"
                        data-display-mode="inline">
               </div>
             </div>
@@ -211,7 +211,7 @@
                 <button class="button is-primary" v-show="edit" @click="changeTodo">Update</button>
               </div>
               <div class="control">
-                <button class="button is-text" v-show="edit" @click="edit=false">Cancel</button>
+                <button class="button is-text" v-show="edit" @click="goEdit">Cancel</button>
               </div>
             </div>
           </div>
@@ -239,6 +239,11 @@
         edit: false,
         toggleType: '',
         calendar: '',
+        editDetail: {
+          title: '',
+          content: '',
+          due_date: '',
+        }
       },
       methods: {
         // Lists methods
@@ -315,9 +320,9 @@
               console.log('Save todo');
               const todo = res.data;
               list.todos.unshift(todo);
-              this.edit = true;
-              this.calendar.clear()
+              this.selectedTodo = todo;
               this.toggleTodo(todo);
+              this.goEdit();
             });
             this.todoInput = '';
           } else {
@@ -325,10 +330,15 @@
           }
         },
         changeTodo: function () {
-          axios.get(
-            "{% url 'todos:todos_detail' 123 %}".replace('123', `${this.selectedTodo.id}`))
+          const data = this.editDetail;
+          data.list = this.selectedTodo.list;
+          axios.patch(
+            "{% url 'todos:todos_detail' 123 %}".replace('123', `${this.selectedTodo.id}`), data)
             .then(res => {
-              console.log(res.data);
+              this.selectedTodo.title = res.data.title;
+              this.selectedTodo.content = res.data.content;
+              this.selectedTodo.due_date = res.data.due_date;
+              this.edit = false;
             });
         },
         deleteTodo: function () {
@@ -354,13 +364,29 @@
         toggleTodo: function (todo) {
           if (this.toggle) {
             this.toggle = false;
-            this.toggleType = ''
+            this.toggleType = '';
+            this.edit = false;
           } else {
             this.toggle = true;
             this.toggleType = 'todo';
             this.selectedTodo = todo;
           }
         },
+        goEdit: function () {
+          if (this.edit) {
+            this.edit = false;
+          } else {
+            this.editDetail.title = this.selectedTodo.title;
+            this.editDetail.content = this.selectedTodo.content;
+            this.editDetail.due_date = this.selectedTodo.due_date;
+            this.edit = true;
+            if (this.selectedTodo.due_date) {
+              this.calendar.startDate = this.selectedTodo.due_date;
+            } else {
+              this.calendar.clear();
+            }
+          }
+        }
       },
       created: function () {
         let url = "{% url "accounts:profile" "foobar" %}";
@@ -417,7 +443,7 @@
       mounted() {
         this.calendar = new bulmaCalendar(this.$refs.trigger);
         this.calendar.on('select',
-          e => this.selectedTodo.due_date = this.calendar.value().replace('/', '-').replace('/', '-') || null);
+          e => this.selectedTodo.due_date = this.calendar.value() || null);
       },
     });
   </script>
