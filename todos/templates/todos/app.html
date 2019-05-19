@@ -56,59 +56,66 @@
           <aside class="menu" v-else style="margin-top: 10px;">
             <p class="menu-label"></p> <!-- for first-label margin control -->
             <!-- Stared & Not Finished -->
-            <p class="menu-label" v-show="stared.length">
-              Important
-            </p>
-            <ul class="menu-list">
-              <li v-for="todo in stared">
-                <a>
-                  <span class="has-text-primary" @click="important(todo)"><i class="fas fa-star"></i></span>
-                  <span class="" @click="check(todo)" style="margin-right: 10px"><i class="far fa-square"></i></span>
-                  <span style="display: inline-block; width: 88%;" @click="toggleTodo(todo)">[[ todo.title ]]</span>
-                </a>
-              </li>
-            </ul>
+            <div>
+              <p class="menu-label" v-show="stared.length">
+                Important
+              </p>
+              <ul class="menu-list">
+                <li v-for="todo in stared">
+                  <a>
+                    <span class="has-text-primary" @click="important(todo)"><i class="fas fa-star"></i></span>
+                    <span class="" @click="check(todo)" style="margin-right: 10px"><i class="far fa-square"></i></span>
+                    <span style="display: inline-block; width: 88%;" @click="toggleTodo(todo)">[[ todo.title ]]</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
             <!-- Not Finished -->
-            <p class="menu-label" v-show="notFinished.length">
-              Todos
-            </p>
-            <ul class="menu-list">
-              <li v-for="todo in notFinished">
-                <a>
-                  <span @click="important(todo)"><i class="far fa-star"></i></span>
-                  <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-square"></i></span>
-                  <span style="display: inline-block; width: 88%;" @click="toggleTodo(todo)">[[ todo.title ]]</span>
-                </a>
-              </li>
-            </ul>
+            <div>
+              <p class="menu-label"></p> <!-- for first-label margin control -->
+              <p class="menu-label" v-show="notFinished.length">
+                Todos
+              </p>
+              <ul class="menu-list">
+                <li v-for="todo in notFinished">
+                  <a>
+                    <span @click="important(todo)"><i class="far fa-star"></i></span>
+                    <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-square"></i></span>
+                    <span style="display: inline-block; width: 88%;" @click="toggleTodo(todo)">[[ todo.title ]]</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
             <!-- Finished -->
-            <p class="menu-label" v-show="finished.length || staredFinished.length">
-              Finished
-            </p>
+            <p class="menu-label" v-show="finished.length || staredFinished.length">Finished</p>
             <!-- Stared & Finished -->
-            <ul class="menu-list" v-show="staredFinished.length">
-              <li v-for="todo in staredFinished">
-                <a>
-                  <span class="has-text-primary" @click="important(todo)"><i class="fas fa-star"></i></span>
-                  <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-check-square"></i></span>
-                  <span style="display: inline-block; width: 88%;" @click="toggleTodo(todo)">
+            <div>
+              <ul class="menu-list" v-show="staredFinished.length">
+                <li v-for="todo in staredFinished">
+                  <a>
+                    <span class="has-text-primary" @click="important(todo)"><i class="fas fa-star"></i></span>
+                    <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-check-square"></i></span>
+                    <span style="display: inline-block; width: 88%;" @click="toggleTodo(todo)">
                     <s>[[ todo.title ]]</s>
                   </span>
-                </a>
-              </li>
-            </ul>
+                  </a>
+                </li>
+              </ul>
+            </div>
             <!-- Not Stared & Finished -->
-            <ul class="menu-list" v-show="finished.length">
-              <li v-for="todo in finished">
-                <a>
-                  <span @click="important(todo)"><i class="far fa-star"></i></span>
-                  <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-check-square"></i></span>
-                  <span style="display: inline-block; width: 88%;" @click="toggleTodo(todo)">
+            <div>
+              <ul class="menu-list" v-show="finished.length">
+                <li v-for="todo in finished">
+                  <a>
+                    <span @click="important(todo)"><i class="far fa-star"></i></span>
+                    <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-check-square"></i></span>
+                    <span style="display: inline-block; width: 88%;" @click="toggleTodo(todo)">
                     <s>[[ todo.title ]]</s>
                   </span>
-                </a>
-              </li>
-            </ul>
+                  </a>
+                </li>
+              </ul>
+            </div>
           </aside>
         </div>
       </div>
@@ -166,36 +173,48 @@
         <p class="title" style="display: flex;">
           [[ selectedTodo.title ]]
           <span style="margin-left: auto;"></span>
-          <a style="font-size: 1.15rem; margin-right: 10px;" class="has-text-black" v-show="!edit" @click="edit=true">
+          <a style="font-size: 1.15rem; margin-right: 10px;" class="has-text-black" v-show="!edit"
+             @click="edit=true; calendar.clear();">
             <i class="far fa-edit"></i></a>
           <a style="font-size: 1.15rem; margin-right: 12px;" class="has-text-black" @click="deleteTodo(selectedTodo)">
             <i class="far fa-trash-alt"></i></a>
           <button class="delete" aria-label="close" @click="toggleTodo(selectedTodo)"></button>
         </p>
+        <!-- View Todos -->
         <div class="box" v-show="!edit">
           view
         </div>
+        <!-- Edit Todos -->
         <div class="box" v-show="edit">
           <div class="field">
-            <p class="control has-icons-left has-icons-right">
-              <input class="input" type="email" placeholder="Set due date" v-model="selectedTodo.deadline">
-              <span class="icon is-small is-left">
-                <i class="fas fa-envelope"></i>
-              </span>
-            </p>
+            <div class="field">
+              <label class="label">Title</label>
+              <div class="control">
+                <input class="input" type="text" placeholder="Title input" v-model="selectedTodo.title">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Content</label>
+              <div class="control">
+                <textarea class="textarea" placeholder="Content input" v-model="selectedTodo.content"></textarea>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Due Time</label>
+              <div class="control" class="input">
+                <input ref='trigger' type='date' data-show-header="false" data-date-format="YYYY/MM/DD"
+                       data-display-mode="inline">
+              </div>
+            </div>
+            <div class="field is-grouped">
+              <div class="control">
+                <button class="button is-primary" v-show="edit" @click="changeTodo">Update</button>
+              </div>
+              <div class="control">
+                <button class="button is-text" v-show="edit" @click="edit=false">Cancel</button>
+              </div>
+            </div>
           </div>
-          <div class="field">
-            <p class="control has-icons-left">
-              <input class="input" type="password" placeholder="Password">
-              <span class="icon is-small is-left">
-                <i class="fas fa-lock"></i>
-              </span>
-            </p>
-          </div>
-        </div>
-        <div>
-          <button class="button is-primary" v-show="edit" @click="changeTodo">Update</button>
-          <button class="button" v-show="edit" @click="edit=false">Cancel</button>
         </div>
       </section>
     </div>
@@ -219,37 +238,10 @@
         toggle: false,
         edit: false,
         toggleType: '',
+        calendar: '',
       },
       methods: {
-        toggleTodo: function (todo) {
-          if (this.toggle) {
-            this.toggle = false;
-            this.toggleType = ''
-          } else {
-            this.toggle = true;
-            this.toggleType = 'todo';
-            this.selectedTodo = todo;
-          }
-        },
-        toggleTitle: function () {
-          if (this.toggle) {
-            this.toggle = false;
-            this.toggleType = ''
-          } else {
-            this.toggle = true;
-            this.toggleType = 'title';
-            this.changeTitle = this.selectedList.title;
-          }
-        },
-        toggleInput: function () {
-          if (this.toggle) {
-            this.toggle = false;
-            this.toggleType = ''
-          } else {
-            this.toggle = true;
-            this.toggleType = 'input'
-          }
-        },
+        // Lists methods
         createList: function () {
           if (this.listInput) {
             axios.post("{% url 'todos:lists_list' %}", {
@@ -264,70 +256,6 @@
             this.toggle = false;
           } else {
             console.log('Nothing to submit')
-          }
-        },
-        createTodo: function (list) {
-          if (this.todoInput) {
-            axios.post("{% url 'todos:todos_list' %}", {
-              title: this.todoInput,
-              list: list.id,
-            }).then((res) => {
-              console.log('Save todo');
-              const todo = res.data;
-              list.todos.unshift(todo);
-              this.edit = true;
-              this.toggleTodo(todo);
-            });
-            this.todoInput = '';
-          } else {
-            console.log('Nothing to submit')
-          }
-        },
-        createDetail: function (todo) {
-          if (this.detailInput) {
-            let url = "{% url 'todos:details_list' 0 %}";
-            url = url.replace('0', `${todo.id}`);
-            axios.post(url, {
-              content: this.detailInput,
-              todo: todo.id,
-            }).then((res) => {
-              console.log('Save detail');
-              const detail = res.data;
-              todo.details.push(detail);
-            });
-            this.detailInput = '';
-          } else {
-            console.log('Nothing to submit')
-          }
-        },
-        selectList: function (list) {
-          this.selectedList = list;
-        },
-        check: function (todo) {
-          axios.get("{% url 'todos:todos_check' 123 %}".replace('123', `${todo.id}`))
-            .then(res => todo.check = res.data.check);
-        },
-        important: function (todo) {
-          axios.get("{% url 'todos:todos_important' 123 %}".replace('123', `${todo.id}`))
-            .then(res => todo.important = res.data.important);
-        },
-        changeTodo: function () {
-          axios.get(
-            "{% url 'todos:todos_detail' 123 %}".replace('123', `${this.selectedTodo.id}`))
-            .then(res => {
-              console.log(res.data);
-            });
-        },
-        deleteTodo: function () {
-          const result = confirm(`"${this.selectedTodo.title}" will be deleted forever.`);
-          if (result) {
-            axios.delete("{% url 'todos:todos_detail' 123 %}".replace('123', `${this.selectedTodo.id}`))
-              .then(res => {
-                this.selectedList.todos = this.selectedList.todos.filter(todo => todo !== this.selectedTodo);
-                this.selectedTodo = [];
-                this.toggle = false;
-                this.toggleType = '';
-              })
           }
         },
         changeList: function () {
@@ -353,6 +281,84 @@
                   this.selectedList = [];
                 }
               })
+          }
+        },
+        selectList: function (list) {
+          this.selectedList = list;
+        },
+        toggleTitle: function () {
+          if (this.toggle) {
+            this.toggle = false;
+            this.toggleType = ''
+          } else {
+            this.toggle = true;
+            this.toggleType = 'title';
+            this.changeTitle = this.selectedList.title;
+          }
+        },
+        toggleInput: function () {
+          if (this.toggle) {
+            this.toggle = false;
+            this.toggleType = ''
+          } else {
+            this.toggle = true;
+            this.toggleType = 'input'
+          }
+        },
+        // Todos methods
+        createTodo: function (list) {
+          if (this.todoInput) {
+            axios.post("{% url 'todos:todos_list' %}", {
+              title: this.todoInput,
+              list: list.id,
+            }).then((res) => {
+              console.log('Save todo');
+              const todo = res.data;
+              list.todos.unshift(todo);
+              this.edit = true;
+              this.calendar.clear()
+              this.toggleTodo(todo);
+            });
+            this.todoInput = '';
+          } else {
+            console.log('Nothing to submit')
+          }
+        },
+        changeTodo: function () {
+          axios.get(
+            "{% url 'todos:todos_detail' 123 %}".replace('123', `${this.selectedTodo.id}`))
+            .then(res => {
+              console.log(res.data);
+            });
+        },
+        deleteTodo: function () {
+          const result = confirm(`"${this.selectedTodo.title}" will be deleted forever.`);
+          if (result) {
+            axios.delete("{% url 'todos:todos_detail' 123 %}".replace('123', `${this.selectedTodo.id}`))
+              .then(res => {
+                this.selectedList.todos = this.selectedList.todos.filter(todo => todo !== this.selectedTodo);
+                this.selectedTodo = [];
+                this.toggle = false;
+                this.toggleType = '';
+              })
+          }
+        },
+        check: function (todo) {
+          axios.get("{% url 'todos:todos_check' 123 %}".replace('123', `${todo.id}`))
+            .then(res => todo.check = res.data.check);
+        },
+        important: function (todo) {
+          axios.get("{% url 'todos:todos_important' 123 %}".replace('123', `${todo.id}`))
+            .then(res => todo.important = res.data.important);
+        },
+        toggleTodo: function (todo) {
+          if (this.toggle) {
+            this.toggle = false;
+            this.toggleType = ''
+          } else {
+            this.toggle = true;
+            this.toggleType = 'todo';
+            this.selectedTodo = todo;
           }
         },
       },
@@ -402,7 +408,17 @@
             return []
           }
         },
-      }
+        niceDate() {
+          if (this.date) {
+            return this.date.toLocaleDateString()
+          }
+        },
+      },
+      mounted() {
+        this.calendar = new bulmaCalendar(this.$refs.trigger);
+        this.calendar.on('select',
+          e => this.selectedTodo.due_date = this.calendar.value().replace('/', '-').replace('/', '-') || null);
+      },
     });
   </script>
 {% endblock %}
