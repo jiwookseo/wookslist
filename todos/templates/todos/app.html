@@ -517,7 +517,7 @@
       mounted() {
         this.calendar = new bulmaCalendar(this.$refs.trigger);
         this.calendar.on('select',
-          e => this.selectedTodo.due_date = this.calendar.value() || null);
+          e => this.editDetail.due_date = this.calendar.value() || null);
       },
     });
   </script>
