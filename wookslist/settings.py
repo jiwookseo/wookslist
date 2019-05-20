@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'bulma',
     'django_extensions',
+    'whitenoise.runserver_nostatic',
 ]
 
 MIDDLEWARE = [
