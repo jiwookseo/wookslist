@@ -26,16 +26,16 @@ Demo App 을 [Heroku](https://www.heroku.com/) 을 이용해 배포했습니다.
 
 1. `pip install` 명령어를 통해 `requirements.txt` 에 저장된 프로젝트에 필요한 패키지를 설치합니다.
 
-  ```
-  > pip install -r requirements.txt
-  ```
+   ```
+   > pip install -r requirements.txt
+   ```
 
 2. migrate를 한 뒤 Django 프로젝트를 실행합니다.
 
-  ```
-  > python manage.py migrate
-  > python manage.py runserver
-  ```
+   ```
+   > python manage.py migrate
+   > python manage.py runserver
+   ```
 
 3. 만약 서버에 접속되지 않는다면, `wookslist/settings.py` 의 `ALLOWED_HOSTS` 를 수정해줍니다.
 
