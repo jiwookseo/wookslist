@@ -3,8 +3,8 @@
 {% block app %}
   <div class="container is-fluid" v-if="'{{ user.is_authenticated }}' == 'True'">
     <div class="tile is-ancestor">
+      <!-- List Menu -->
       <div class="tile is-2 is-vertical is-parent">
-        <!-- List Menu -->
         <div class="tile is-child box">
           <div class="title">{{ user.username }}</div>
           <a class="button is-dark is-inverted is-fullwidth" @click="toggleInput" style="margin-top: auto">
@@ -26,12 +26,14 @@
       </div>
       <!-- Selected List -->
       <div class="tile is-parent">
+        <!-- No Lists -->
         <div class="tile is-child box" v-if="!selectedList.todos">
           <p class="title">Create new list</p>
           <a class="button is-dark is-inverted is-fullwidth" @click="toggleInput" style="margin-top: auto">
             <i class="fas fa-plus" style="margin-right: 7px"></i> add new
           </a>
         </div>
+        <!-- Have Lists -->
         <div class="tile is-child box" v-else>
           <!-- List Title -->
           <p class="title">[[ selectedList.title ]]
@@ -52,69 +54,102 @@
               </span>
             </div>
           </aside>
-          <!-- Todos -->
+          <!-- Have Todos -->
           <aside class="menu" v-else style="margin-top: 10px;">
-            <p class="menu-label"></p> <!-- for first-label margin control -->
-            <!-- Stared & Not Finished -->
-            <div>
-              <p class="menu-label" v-show="stared.length">
-                Important
-              </p>
-              <ul class="menu-list">
-                <li v-for="todo in stared">
-                  <a>
-                    <span class="has-text-primary" @click="important(todo)"><i class="fas fa-star"></i></span>
-                    <span class="" @click="check(todo)" style="margin-right: 10px"><i class="far fa-square"></i></span>
-                    <span style="display: inline-block; width: 88%;" @click="toggleTodo(todo)">[[ todo.title ]]</span>
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <!-- Not Finished -->
-            <div>
-              <p class="menu-label"></p> <!-- for first-label margin control -->
-              <p class="menu-label" v-show="notFinished.length">
-                Todos
-              </p>
-              <ul class="menu-list">
-                <li v-for="todo in notFinished">
-                  <a>
-                    <span @click="important(todo)"><i class="far fa-star"></i></span>
-                    <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-square"></i></span>
-                    <span style="display: inline-block; width: 88%;" @click="toggleTodo(todo)">[[ todo.title ]]</span>
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <!-- Finished -->
-            <p class="menu-label" v-show="finished.length || staredFinished.length">Finished</p>
-            <!-- Stared & Finished -->
-            <div>
-              <ul class="menu-list" v-show="staredFinished.length">
-                <li v-for="todo in staredFinished">
-                  <a>
-                    <span class="has-text-primary" @click="important(todo)"><i class="fas fa-star"></i></span>
-                    <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-check-square"></i></span>
-                    <span style="display: inline-block; width: 88%;" @click="toggleTodo(todo)">
+            <div class="tile is-parent is-vertical">
+              <!-- Overdue -->
+              <div class="tile is-child" v-show="overdue.length || staredOverdue.length">
+                <p class="menu-label has-text-danger has-text-weight-bold">Overdue</p>
+                <!-- Stared & Overdue -->
+                <div v-show="staredOverdue.length">
+                  <ul class="menu-list">
+                    <li v-for="todo in staredOverdue">
+                      <a>
+                        <span class="has-text-primary" @click="important(todo)"><i class="fas fa-star"></i></span>
+                        <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-square"></i></span>
+                        <span style="display: inline-block; width: 87.5%;"
+                              @click="toggleTodo(todo)">[[ todo.title ]]</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+                <!-- Not Stared & Overdue -->
+                <div v-show="overdue.length">
+                  <ul class="menu-list">
+                    <li v-for="todo in overdue">
+                      <a>
+                        <span @click="important(todo)"><i class="far fa-star"></i></span>
+                        <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-square"></i></span>
+                        <span style="display: inline-block; width: 87.5%;"
+                              @click="toggleTodo(todo)">[[ todo.title ]]</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <!-- Stared & Not Finished -->
+              <div class="tile is-child" v-show="stared.length">
+                <p class="menu-label has-text-primary has-text-weight-bold">
+                  Important
+                </p>
+                <ul class="menu-list">
+                  <li v-for="todo in stared">
+                    <a>
+                      <span class="has-text-primary" @click="important(todo)"><i class="fas fa-star"></i></span>
+                      <span class="" @click="check(todo)" style="margin-right: 10px"><i
+                          class="far fa-square"></i></span>
+                      <span style="display: inline-block; width: 87.5%;" @click="toggleTodo(todo)">[[ todo.title ]]</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <!-- Not Finished -->
+              <div class="tile is-child" v-show="notFinished.length">
+                <p class="menu-label has-text-weight-bold">
+                  Todos
+                </p>
+                <ul class="menu-list">
+                  <li v-for="todo in notFinished">
+                    <a>
+                      <span @click="important(todo)"><i class="far fa-star"></i></span>
+                      <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-square"></i></span>
+                      <span style="display: inline-block; width: 87.5%;" @click="toggleTodo(todo)">[[ todo.title ]]</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <!-- Finished -->
+              <div class="tile is-child" v-show="finished.length || staredFinished.length">
+                <p class="menu-label has-text-weight-bold has-text-grey-light">Finished</p>
+                <!-- Stared & Finished -->
+                <div v-show="staredFinished.length">
+                  <ul class="menu-list">
+                    <li v-for="todo in staredFinished">
+                      <a>
+                        <span class="has-text-primary" @click="important(todo)"><i class="fas fa-star"></i></span>
+                        <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-check-square"></i></span>
+                        <span style="display: inline-block; width: 87.5%;" @click="toggleTodo(todo)">
                     <s>[[ todo.title ]]</s>
                   </span>
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <!-- Not Stared & Finished -->
-            <div>
-              <ul class="menu-list" v-show="finished.length">
-                <li v-for="todo in finished">
-                  <a>
-                    <span @click="important(todo)"><i class="far fa-star"></i></span>
-                    <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-check-square"></i></span>
-                    <span style="display: inline-block; width: 88%;" @click="toggleTodo(todo)">
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+                <!-- Not Stared & Finished -->
+                <div v-show="finished.length">
+                  <ul class="menu-list">
+                    <li v-for="todo in finished">
+                      <a>
+                        <span @click="important(todo)"><i class="far fa-star"></i></span>
+                        <span @click="check(todo)" style="margin-right: 10px"><i class="far fa-check-square"></i></span>
+                        <span style="display: inline-block; width: 87.5%;" @click="toggleTodo(todo)">
                     <s>[[ todo.title ]]</s>
                   </span>
-                  </a>
-                </li>
-              </ul>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </aside>
         </div>
@@ -170,6 +205,7 @@
       </section>
       <!-- Todos Detail Modal -->
       <section class="modal-card-body" v-show="toggleType==='todo'" style="padding: 2rem;">
+        <!-- Todos Title -->
         <p class="title" style="display: flex;">
           [[ selectedTodo.title ]]
           <span style="margin-left: auto;"></span>
@@ -181,16 +217,18 @@
           <button class="delete" aria-label="close" @click="toggleTodo(selectedTodo)"></button>
         </p>
         <!-- View Todos -->
-        <div v-show="!edit">
-          <div class="field">
+        <div v-show="!edit" style="margin-top: 2.5rem; margin-left: 0.5rem">
+          <!-- Due Date Field -->
+          <div class="field" style="margin-bottom: 2rem">
             <label class="label">
               <span style="margin-right: 3px"><i class="far fa-clock"></i></span>
-              Due Time
+              Due Date
             </label>
             <div class="content">
               [[ selectedTodo.due_date || "without any due date" ]]
             </div>
           </div>
+          <!-- Content Field -->
           <div class="field">
             <label class="label">
               <span style="margin-right: 3px"><i class="far fa-file-alt"></i></span>
@@ -218,9 +256,9 @@
             </div>
             <div class="field">
               <label class="label">Due Time</label>
-              <div class="control" class="input">
-                <input ref='trigger' type='date' data-show-header="false" data-date-format="YYYY-MM-DD"
-                       data-display-mode="inline">
+              <div class="control">
+                <input ref='trigger' type='date' data-type="date" data-show-header="false" data-date-format="YYYY-MM-DD"
+                       data-display-mode="inline" data-show-clear-button="false" data-show-today-button="false">
               </div>
             </div>
             <div class="field is-grouped">
@@ -260,7 +298,7 @@
           title: '',
           content: '',
           due_date: '',
-        }
+        },
       },
       methods: {
         // Lists methods
@@ -352,6 +390,7 @@
           axios.patch(
             "{% url 'todos:todos_detail' 123 %}".replace('123', `${this.selectedTodo.id}`), data)
             .then(res => {
+              console.log(res.data);
               this.selectedTodo.title = res.data.title;
               this.selectedTodo.content = res.data.content;
               this.selectedTodo.due_date = res.data.due_date;
@@ -396,12 +435,13 @@
             this.editDetail.title = this.selectedTodo.title;
             this.editDetail.content = this.selectedTodo.content;
             this.editDetail.due_date = this.selectedTodo.due_date;
-            this.edit = true;
             if (this.selectedTodo.due_date) {
-              this.calendar.startDate = this.selectedTodo.due_date;
+              this.calendar.startDate = this.editDetail.due_date;
+              console.log(this.calendar.value());
             } else {
               this.calendar.clear();
             }
+            this.edit = true;
           }
         }
       },
@@ -423,16 +463,38 @@
         }
       },
       computed: {
-        stared: function () {
+        staredOverdue: function () {
+          const date = new Date();
           if (this.selectedList && this.selectedList.todos) {
-            return this.selectedList.todos.filter(todo => todo.important && !todo.check)
+            return this.selectedList.todos.filter(todo =>
+              new Date(todo.due_date || 1000000000000000) <= date && !todo.check && todo.important)
+          } else {
+            return []
+          }
+        },
+        overdue: function () {
+          const date = new Date();
+          if (this.selectedList && this.selectedList.todos) {
+            return this.selectedList.todos.filter(todo =>
+              new Date(todo.due_date || 1000000000000000) < date && !todo.check && !todo.important)
+          } else {
+            return []
+          }
+        },
+        stared: function () {
+          const date = new Date();
+          if (this.selectedList && this.selectedList.todos) {
+            return this.selectedList.todos.filter(todo =>
+              new Date(todo.due_date || 1000000000000000) > date && todo.important && !todo.check)
           } else {
             return []
           }
         },
         notFinished: function () {
+          const date = new Date();
           if (this.selectedList && this.selectedList.todos) {
-            return this.selectedList.todos.filter(todo => !todo.important && !todo.check)
+            return this.selectedList.todos.filter(todo =>
+              new Date(todo.due_date || 1000000000000000) > date && !todo.important && !todo.check)
           } else {
             return []
           }
