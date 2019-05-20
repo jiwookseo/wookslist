@@ -1,7 +1,10 @@
+
+
+![logo image](static/image/og_image.png)
+
 # ㅇㅅㄹㅅㅌ / Wookslist
 
 > Plan Your Life and Never Be Stuck Again
->
 
 * 뽀짝한 미니멀 디자인 Todo SPA
 
