@@ -169,7 +169,7 @@
         <button class="button" @click="toggleTitle">Cancel</button>
       </section>
       <!-- Todos Detail Modal -->
-      <section class="modal-card-body" v-show="toggleType==='todo'">
+      <section class="modal-card-body" v-show="toggleType==='todo'" style="padding: 2rem;">
         <p class="title" style="display: flex;">
           [[ selectedTodo.title ]]
           <span style="margin-left: auto;"></span>
@@ -181,11 +181,28 @@
           <button class="delete" aria-label="close" @click="toggleTodo(selectedTodo)"></button>
         </p>
         <!-- View Todos -->
-        <div class="box" v-show="!edit">
-          view
+        <div v-show="!edit">
+          <div class="field">
+            <label class="label">
+              <span style="margin-right: 3px"><i class="far fa-clock"></i></span>
+              Due Time
+            </label>
+            <div class="content">
+              [[ selectedTodo.due_date || "without any due date" ]]
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">
+              <span style="margin-right: 3px"><i class="far fa-file-alt"></i></span>
+              Content
+            </label>
+            <div class="content">
+              [[ selectedTodo.content || "without any content" ]]
+            </div>
+          </div>
         </div>
         <!-- Edit Todos -->
-        <div class="box" v-show="edit">
+        <div v-show="edit">
           <div class="field">
             <div class="field">
               <label class="label">Title</label>
@@ -432,11 +449,6 @@
             return this.selectedList.todos.filter(todo => !todo.important && todo.check)
           } else {
             return []
-          }
-        },
-        niceDate() {
-          if (this.date) {
-            return this.date.toLocaleDateString()
           }
         },
       },
