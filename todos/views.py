@@ -3,8 +3,8 @@ from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import List, Todo, Detail
-from .serializers import ListSerializer, TodoSerializer, DetailSerializer
+from .models import List, Todo
+from .serializers import ListSerializer, TodoSerializer
 
 
 @api_view(["GET", "POST"])

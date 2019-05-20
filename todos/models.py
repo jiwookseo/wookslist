@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 
 
 class List(models.Model):
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=50)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='lists')
 
     def __str__(self):
@@ -11,7 +11,7 @@ class List(models.Model):
 
 
 class Todo(models.Model):
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=50)
     content = models.TextField(default="", blank=True)
     check = models.BooleanField(default=False)
     due_date = models.DateField(blank=True, null=True)
@@ -25,12 +25,3 @@ class Todo(models.Model):
 
     class Meta:
         ordering = ['-id']
-
-
-class Detail(models.Model):
-    content = models.CharField(max_length=100)
-    check = models.BooleanField(default=False)
-    todo = models.ForeignKey(Todo, on_delete=models.CASCADE, related_name='details')
-
-    def __str__(self):
-        return f"{self.todo.list.user.username}'s Todo detail"
