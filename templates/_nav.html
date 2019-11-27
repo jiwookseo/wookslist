@@ -5,8 +5,8 @@
     <div class="navbar-brand">
       <div class="navbar-item">
         <img
-            @mouseover="logo='static/image/logo2.png'"
-            @mouseleave="logo='static/image/logo1.png'"
+            @mouseover="logo='https://wookslist.herokuapp.com/static/image/logo2.png'"
+            @mouseleave="logo='https://wookslist.herokuapp.com/static/image/logo1.png'"
             :src="logo" @click="goHome">
       </div>
       <span class="navbar-burger burger"
@@ -51,7 +51,7 @@
   const nav = new Vue({
     el: '#nav',
     data: {
-      logo: 'static/image/logo1.png',
+      logo: 'https://wookslist.herokuapp.com/static/image/logo1.png',
       showNav: false,
       query: '',
     },
